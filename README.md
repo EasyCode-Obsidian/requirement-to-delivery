@@ -4,8 +4,8 @@
 [![Skill](https://img.shields.io/badge/Codex-Skill-blue)](./SKILL.md)
 [![Language](https://img.shields.io/badge/README-Bilingual-orange)](./README.md)
 
-> Turn vague requirements into approved drafts, tracked markdown todos, and real execution in the workspace.  
-> 把模糊需求推进为已确认草案、可追踪 Markdown Todo，并最终在工作区执行落地。
+> Turn vague requirements into approved drafts, dual-layer markdown todos, and real execution in the workspace.  
+> 把模糊需求推进为已确认草案、双层 Markdown Todo，并最终在工作区执行落地。
 
 ---
 
@@ -19,8 +19,8 @@
 1. 理解需求
 2. 调研上下文、可用 Skill 和 MCP 能力
 3. 输出草案并与用户确认
-4. 在工作区生成 `TASK_TODO.md`
-5. 根据 Todo 分步执行
+4. 在工作区生成两个 Todo 文件
+5. 根据中粒度与细粒度 Todo 分步执行
 6. 随着真实完成进度更新 `- [ ]` 为 `- [x]`
 
 这个 Skill 适合：
@@ -44,7 +44,7 @@
 - **需求澄清优先**：先明确目标、约束、交付物与成功标准
 - **先调研后追问**：优先利用工作区、Skill、MCP 和现有上下文
 - **草案确认闭环**：用户不满意时，回到调研与澄清阶段继续迭代
-- **Todo 驱动执行**：确认后生成 `TASK_TODO.md`，作为执行真相源
+- **双 Todo 驱动执行**：确认后生成中粒度与细粒度两个 Todo 文件
 - **真实进度同步**：只有任务真的完成后，才把 `- [ ]` 改成 `- [x]`
 - **能力按需调度**：首次激活时盘点可用 Skill / MCP，并按相关性深入
 - **语言跟随用户**：默认跟随用户语言进行讨论与落盘
@@ -70,17 +70,25 @@
 - 如果用户不满意，返回上一阶段继续迭代
 
 #### 5. Write the todo
-- 在工作区根目录生成 `TASK_TODO.md`
+- 在工作区根目录生成：
+  - `TASK_TODO_MEDIUM.md`
+  - `TASK_TODO_FINE.md`
 
 #### 6. Execute from the todo
-- 按 Todo 执行任务
-- 完成一项，更新一项
+- 用中粒度 Todo 跟踪整体进度
+- 用细粒度 Todo 驱动具体执行
+- 完成一项，更新一项，并保持两份 Todo 同步
 
 ---
 
 ### Todo 设计规则
 
-Todo 文件采用以下结构：
+本 Skill 会生成两份 Todo：
+
+- `TASK_TODO_MEDIUM.md`：中粒度、便于审阅与沟通
+- `TASK_TODO_FINE.md`：细粒度、便于直接执行与追踪
+
+两份 Todo 都采用以下层次结构：
 
 - `## Part N:` 表示一个大部分
 - `### N.M` 表示一个小部分
@@ -91,13 +99,28 @@ Todo 文件采用以下结构：
 - `- [ ] Task:` 表示未完成
 - `- [x] Task:` 表示已完成
 
-每个子任务通常应包含：
+中粒度任务通常包含：
 
 - `Task`
 - `Goal`
 - `Done when`
 - `Deliverables`
 - `Notes`
+
+细粒度任务通常包含：
+
+- `Task`
+- `Goal`
+- `Inputs / Dependencies`
+- `Procedure / Implementation notes`
+- `Output / Artifact`
+- `Done when`
+- `Verification`
+- `Notes`
+
+细粒度模板不限于软件开发任务。  
+对于软件任务，它可以细到包结构、文件路径、类职责、接口、测试等；  
+对于文档、研究、流程、运营类任务，则应细到该领域自然适用的执行单元、输入、输出、验证方式与交接点。
 
 ---
 
@@ -111,7 +134,8 @@ Todo 文件采用以下结构：
 ├─ agents/
 │  └─ openai.yaml
 └─ assets/
-   └─ TASK_TODO.template.md
+   ├─ TASK_TODO_MEDIUM.template.md
+   └─ TASK_TODO_FINE.template.md
 ```
 
 ---
@@ -124,8 +148,11 @@ Todo 文件采用以下结构：
 - `agents/openai.yaml`  
   Skill 的 UI / 接口元数据。
 
-- `assets/TASK_TODO.template.md`  
-  推荐的 Todo 模板，用于快速生成 `TASK_TODO.md`。
+- `assets/TASK_TODO_MEDIUM.template.md`  
+  中粒度 Todo 模板，用于生成可审阅、可沟通的计划视图。
+
+- `assets/TASK_TODO_FINE.template.md`  
+  细粒度 Todo 模板，用于生成可直接执行、可追踪、可核验的执行蓝图。
 
 - `LICENSE`  
   本仓库当前使用的开源许可证。
@@ -146,7 +173,9 @@ Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_
 - 不在批准前修改工作区文件，除非用户明确授权
 - 不把部分完成标记为完成
 - 不深度加载与当前任务无关的 Skill / MCP
-- Todo 必须具体、可审计、可执行
+- 中粒度 Todo 必须便于快速审阅
+- 细粒度 Todo 必须便于直接执行
+- 两份 Todo 必须保持同步且都可审计
 
 ---
 
@@ -161,8 +190,8 @@ Its purpose is not to jump straight into implementation, but to move through a d
 1. Understand the requirement
 2. Research relevant workspace context, skills, and MCP capabilities
 3. Present a draft and get user approval
-4. Create `TASK_TODO.md` in the workspace
-5. Execute from the todo
+4. Create two todo files in the workspace
+5. Execute from both a medium-granularity and a fine-granularity view
 6. Update `- [ ]` to `- [x]` only when work is truly complete
 
 This skill is a good fit for:
@@ -186,7 +215,7 @@ This skill is not a good fit for:
 - **Clarification first**: capture goals, constraints, deliverables, and success criteria
 - **Research before questioning**: inspect workspace context, existing skills, and MCP tools first
 - **Draft approval loop**: return to clarification when the user wants revisions
-- **Todo-driven execution**: create `TASK_TODO.md` as the execution source of truth
+- **Dual-todo execution**: create both a medium-granularity and a fine-granularity todo
 - **Honest progress tracking**: only mark items complete when they are actually done
 - **Capability orchestration**: inspect available skills and MCP surfaces on first activation, then use them progressively
 - **Language matching**: follow the user's language by default when practical
@@ -212,17 +241,25 @@ This skill is not a good fit for:
 - Return to clarification if the user requests revisions
 
 #### 5. Write the todo
-- Create `TASK_TODO.md` in the workspace root
+- Create:
+  - `TASK_TODO_MEDIUM.md`
+  - `TASK_TODO_FINE.md`
 
 #### 6. Execute from the todo
-- Work from the todo
-- Update checkbox state as work is actually completed
+- Use the medium todo for scope tracking and review
+- Use the fine todo as the execution blueprint
+- Keep both files synchronized as work progresses
 
 ---
 
 ### Todo design rules
 
-The todo file is structured with:
+This skill generates two todo files:
+
+- `TASK_TODO_MEDIUM.md` for reviewable planning
+- `TASK_TODO_FINE.md` for executable detail
+
+Both todo files use:
 
 - `## Part N:` for major workstreams
 - `### N.M` for concrete subtasks
@@ -233,13 +270,28 @@ Checkbox rules:
 - `- [ ] Task:` means not completed
 - `- [x] Task:` means completed
 
-Each subtask should typically include:
+Medium-granularity subtasks should typically include:
 
 - `Task`
 - `Goal`
 - `Done when`
 - `Deliverables`
 - `Notes`
+
+Fine-granularity subtasks should typically include:
+
+- `Task`
+- `Goal`
+- `Inputs / Dependencies`
+- `Procedure / Implementation notes`
+- `Output / Artifact`
+- `Done when`
+- `Verification`
+- `Notes`
+
+The fine-granularity todo is not limited to software work.  
+For software tasks it may include package layout, file paths, class responsibilities, interfaces, tests, and validation steps.  
+For research, document, operational, or process tasks, it should become equally concrete in the natural units of that domain.
 
 ---
 
@@ -253,7 +305,8 @@ Each subtask should typically include:
 ├─ agents/
 │  └─ openai.yaml
 └─ assets/
-   └─ TASK_TODO.template.md
+   ├─ TASK_TODO_MEDIUM.template.md
+   └─ TASK_TODO_FINE.template.md
 ```
 
 ---
@@ -266,8 +319,11 @@ Each subtask should typically include:
 - `agents/openai.yaml`  
   UI / interface metadata for the skill.
 
-- `assets/TASK_TODO.template.md`  
-  Recommended starter template for generating `TASK_TODO.md`.
+- `assets/TASK_TODO_MEDIUM.template.md`  
+  Recommended starter template for the medium-granularity plan view.
+
+- `assets/TASK_TODO_FINE.template.md`  
+  Recommended starter template for the fine-granularity execution view.
 
 - `LICENSE`  
   The open-source license currently used by this repository.
@@ -288,7 +344,9 @@ Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_
 - Do not modify workspace files before approval unless explicitly authorized
 - Do not mark partial progress as complete
 - Do not deeply load unrelated skills or tools
-- Keep the todo concrete, auditable, and execution-friendly
+- Keep the medium todo reviewable and concise
+- Keep the fine todo concrete, auditable, and execution-friendly
+- Keep both todo files synchronized
 
 ---
 

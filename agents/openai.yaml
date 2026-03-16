@@ -1,4 +1,4 @@
 interface:
   display_name: "Requirement to Delivery"
   short_description: "Turn requirements into tracked execution"
-  default_prompt: "Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_TODO.md, and execute it step by step."
+  default_prompt: "Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_TODO_MEDIUM.md and TASK_TODO_FINE.md, then execute it step by step."
