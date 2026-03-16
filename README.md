@@ -1,147 +1,168 @@
 # requirement-to-delivery
 
-> A Codex skill for turning vague requirements into approved drafts, tracked markdown todos, and real execution in the workspace.  
-> 一个用于把模糊需求推进为已确认草案、可追踪 Markdown Todo，并最终在工作区执行落地的 Codex Skill。
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Skill](https://img.shields.io/badge/Codex-Skill-blue)](./SKILL.md)
+[![Language](https://img.shields.io/badge/README-Bilingual-orange)](./README.md)
+
+> Turn vague requirements into approved drafts, tracked markdown todos, and real execution in the workspace.  
+> 把模糊需求推进为已确认草案、可追踪 Markdown Todo，并最终在工作区执行落地。
 
 ---
 
 ## 中文说明
 
-### 这是什么
+### 简介
 
-`requirement-to-delivery` 是一个面向复杂任务交付的工作流型 Skill。  
-它的目标不是直接“跳进实现”，而是帮助 Codex 按照更稳定的节奏推进任务：
+`requirement-to-delivery` 是一个面向复杂任务交付的 Codex Skill。  
+它的目标不是让代理直接跳进实现，而是让它先建立正确的执行节奏：
 
-1. 理解用户需求  
-2. 调研现有上下文、Skill、MCP 与工作区信息  
-3. 提出草案并与用户确认  
-4. 在工作区生成 `TASK_TODO.md`  
-5. 根据 Todo 执行任务  
-6. 随任务进度把 `- [ ]` 更新为 `- [x]`
+1. 理解需求
+2. 调研上下文、可用 Skill 和 MCP 能力
+3. 输出草案并与用户确认
+4. 在工作区生成 `TASK_TODO.md`
+5. 根据 Todo 分步执行
+6. 随着真实完成进度更新 `- [ ]` 为 `- [x]`
 
-这个 Skill 适用于：
+这个 Skill 适合：
 
 - 功能开发
-- 重构任务
-- 调查/排障
+- 代码重构
+- 调查与排障
 - 多步骤实现任务
-- 需要先澄清、再规划、再执行的工作
+- 需要先澄清、再规划、再执行的复杂工作
 
-不适用于：
+不适合：
 
-- 纯聊天
-- 一次性小回答
-- 完全不需要计划或执行的简单任务
+- 纯聊天或头脑风暴
+- 一次性的小回答
+- 不需要计划与执行跟踪的微小任务
 
-### 核心特性
+---
 
-- **需求澄清优先**：先把目标、约束、交付物和成功标准搞清楚
-- **调研后追问**：优先从工作区、Skill、MCP 获取信息，再问用户阻塞性问题
-- **草案确认机制**：用户不满意时，回到调研与澄清阶段继续迭代
-- **Todo 驱动执行**：经确认后生成 `TASK_TODO.md` 作为执行真相源
-- **进度实时同步**：只有真实完成后，才把 `- [ ]` 改为 `- [x]`
-- **能力按需调度**：首次激活时盘点可用 Skill 与 MCP，并按需深入使用
+### 核心能力
+
+- **需求澄清优先**：先明确目标、约束、交付物与成功标准
+- **先调研后追问**：优先利用工作区、Skill、MCP 和现有上下文
+- **草案确认闭环**：用户不满意时，回到调研与澄清阶段继续迭代
+- **Todo 驱动执行**：确认后生成 `TASK_TODO.md`，作为执行真相源
+- **真实进度同步**：只有任务真的完成后，才把 `- [ ]` 改成 `- [x]`
+- **能力按需调度**：首次激活时盘点可用 Skill / MCP，并按相关性深入
 - **语言跟随用户**：默认跟随用户语言进行讨论与落盘
+
+---
+
+### 工作流概览
+
+#### 1. Session bootstrap
+- 识别当前可用的 skills、MCP、工作区上下文
+- 只按需深入，不一次性加载全部能力
+
+#### 2. Understand the requirement
+- 提炼目标、约束、交付物、成功标准、未知项
+
+#### 3. Research and clarification loop
+- 先看本地工作区
+- 再复用相关 Skill / MCP
+- 最后再向用户提出阻塞性问题
+
+#### 4. Draft and approval loop
+- 输出草案
+- 如果用户不满意，返回上一阶段继续迭代
+
+#### 5. Write the todo
+- 在工作区根目录生成 `TASK_TODO.md`
+
+#### 6. Execute from the todo
+- 按 Todo 执行任务
+- 完成一项，更新一项
+
+---
+
+### Todo 设计规则
+
+Todo 文件采用以下结构：
+
+- `## Part N:` 表示一个大部分
+- `### N.M` 表示一个小部分
+- 每个小部分有唯一的 checkbox 行
+
+勾选规则：
+
+- `- [ ] Task:` 表示未完成
+- `- [x] Task:` 表示已完成
+
+每个子任务通常应包含：
+
+- `Task`
+- `Goal`
+- `Done when`
+- `Deliverables`
+- `Notes`
+
+---
 
 ### 仓库结构
 
 ```text
 .
-├─ SKILL.md
+├─ LICENSE
 ├─ README.md
+├─ SKILL.md
 ├─ agents/
 │  └─ openai.yaml
 └─ assets/
    └─ TASK_TODO.template.md
 ```
 
+---
+
 ### 文件说明
 
 - `SKILL.md`  
-  Skill 主体说明，定义触发场景、工作流、守卫规则与执行方式。
+  Skill 主说明文件，定义触发场景、工作流、守卫规则与执行方式。
 
 - `agents/openai.yaml`  
   Skill 的 UI / 接口元数据。
 
 - `assets/TASK_TODO.template.md`  
-  `TASK_TODO.md` 的推荐模板，用于在执行前快速生成可追踪计划。
+  推荐的 Todo 模板，用于快速生成 `TASK_TODO.md`。
 
-### 使用方式
+- `LICENSE`  
+  本仓库当前使用的开源许可证。
 
-当用户提出一个较大、较模糊、或需要多阶段推进的任务时，可以调用这个 Skill。
+---
 
-示例：
+### 使用示例
 
 ```text
 Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_TODO.md, and execute it step by step.
 ```
 
-### 典型工作流
-
-1. **Session bootstrap**
-   - 盘点当前可用 skills、MCP、工作区上下文
-   - 只按需深入，不一次性加载全部能力
-
-2. **Understand the requirement**
-   - 提炼目标、约束、交付物、成功标准、未知项
-
-3. **Research and clarification loop**
-   - 先看本地
-   - 再复用 skill / MCP
-   - 最后再问用户
-
-4. **Draft and approval loop**
-   - 输出草案
-   - 用户不满意则返回上一阶段继续迭代
-
-5. **Write the todo**
-   - 在工作区根目录创建 `TASK_TODO.md`
-
-6. **Execute from the todo**
-   - 按 Todo 实施
-   - 完成即更新勾选状态
-
-### Todo 设计原则
-
-Todo 文件使用以下结构：
-
-- `## Part N:` 表示一个大部分
-- `### N.M` 表示一个小部分
-- 每个小部分有唯一的 checkbox 行
-- 使用：
-  - `- [ ] Task:` 表示未完成
-  - `- [x] Task:` 表示已完成
-
-并补充：
-
-- `Goal:`
-- `Done when:`
-- `Deliverables:`
-- `Notes:`
+---
 
 ### 设计原则
 
-- 不跳过草案确认
-- 不在批准前修改工作区文件（除非用户明确允许）
-- 不为部分完成而打勾
-- 不做与当前任务无关的 Skill / MCP 深度加载
-- Todo 必须具体、可核验、可追踪
+- 不跳过非简单任务的草案确认
+- 不在批准前修改工作区文件，除非用户明确授权
+- 不把部分完成标记为完成
+- 不深度加载与当前任务无关的 Skill / MCP
+- Todo 必须具体、可审计、可执行
 
 ---
 
 ## English
 
-### What this is
+### Overview
 
-`requirement-to-delivery` is a workflow-oriented Codex skill for handling non-trivial tasks from vague intent to real delivery.
+`requirement-to-delivery` is a workflow-oriented Codex skill for non-trivial task delivery.
 
-Instead of jumping straight into implementation, it helps Codex move through a disciplined sequence:
+Its purpose is not to jump straight into implementation, but to move through a disciplined sequence:
 
-1. Understand the requirement  
-2. Research relevant workspace context, skills, and MCP capabilities  
-3. Present a draft and get user approval  
-4. Create `TASK_TODO.md` in the workspace  
-5. Execute from the todo  
+1. Understand the requirement
+2. Research relevant workspace context, skills, and MCP capabilities
+3. Present a draft and get user approval
+4. Create `TASK_TODO.md` in the workspace
+5. Execute from the todo
 6. Update `- [ ]` to `- [x]` only when work is truly complete
 
 This skill is a good fit for:
@@ -154,93 +175,112 @@ This skill is a good fit for:
 
 This skill is not a good fit for:
 
-- casual conversation
+- casual conversation or brainstorming only
 - one-off quick answers
-- tiny tasks that do not need a plan or execution tracking
+- tiny tasks that do not need planning or execution tracking
+
+---
 
 ### Core capabilities
 
-- **Requirement clarification first**: extract goals, constraints, deliverables, and success criteria
-- **Research before questioning**: inspect the workspace, skills, and MCP tools before asking the user blocking questions
-- **Draft approval loop**: refine the draft when the user is not satisfied
-- **Todo-driven execution**: create `TASK_TODO.md` as the source of truth after approval
-- **Honest progress tracking**: only mark tasks complete when they are actually done
+- **Clarification first**: capture goals, constraints, deliverables, and success criteria
+- **Research before questioning**: inspect workspace context, existing skills, and MCP tools first
+- **Draft approval loop**: return to clarification when the user wants revisions
+- **Todo-driven execution**: create `TASK_TODO.md` as the execution source of truth
+- **Honest progress tracking**: only mark items complete when they are actually done
 - **Capability orchestration**: inspect available skills and MCP surfaces on first activation, then use them progressively
 - **Language matching**: follow the user's language by default when practical
 
-### Repository structure
+---
 
-```text
-.
-├─ SKILL.md
-├─ README.md
-├─ agents/
-│  └─ openai.yaml
-└─ assets/
-   └─ TASK_TODO.template.md
-```
+### Workflow summary
 
-### File overview
+#### 1. Session bootstrap
+- Inspect available skills, MCP surfaces, and relevant workspace context
+- Load deeper details only when needed
 
-- `SKILL.md`  
-  The main skill definition, including trigger conditions, workflow, guardrails, and execution behavior.
+#### 2. Understand the requirement
+- Capture goals, constraints, deliverables, success criteria, and unknowns
 
-- `agents/openai.yaml`  
-  UI / interface metadata for the skill.
+#### 3. Research and clarification loop
+- Inspect local context first
+- Reuse relevant skills / MCP tools
+- Ask the user only the minimum blocking questions
 
-- `assets/TASK_TODO.template.md`  
-  A recommended starting template for generating `TASK_TODO.md`.
+#### 4. Draft and approval loop
+- Present a draft
+- Return to clarification if the user requests revisions
 
-### Usage
+#### 5. Write the todo
+- Create `TASK_TODO.md` in the workspace root
 
-Use this skill when a task is large enough to require clarification, a plan, and step-by-step execution.
+#### 6. Execute from the todo
+- Work from the todo
+- Update checkbox state as work is actually completed
 
-Example prompt:
-
-```text
-Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_TODO.md, and execute it step by step.
-```
-
-### Typical workflow
-
-1. **Session bootstrap**
-   - Inspect available skills, MCP surfaces, and relevant workspace context
-   - Load deeper details only when needed
-
-2. **Understand the requirement**
-   - Capture goals, constraints, deliverables, success criteria, and unknowns
-
-3. **Research and clarification loop**
-   - Inspect local context first
-   - Reuse skills / MCP when relevant
-   - Ask the user only the minimum blocking questions
-
-4. **Draft and approval loop**
-   - Present a draft
-   - Return to clarification if the user wants revisions
-
-5. **Write the todo**
-   - Create `TASK_TODO.md` in the workspace root
-
-6. **Execute from the todo**
-   - Work from the todo
-   - Update checkbox status honestly as work completes
+---
 
 ### Todo design rules
 
-The todo file is structured as:
+The todo file is structured with:
 
 - `## Part N:` for major workstreams
 - `### N.M` for concrete subtasks
 - one checkbox line per subtask
 
-Each subtask should include:
+Checkbox rules:
+
+- `- [ ] Task:` means not completed
+- `- [x] Task:` means completed
+
+Each subtask should typically include:
 
 - `Task`
 - `Goal`
 - `Done when`
 - `Deliverables`
 - `Notes`
+
+---
+
+### Repository structure
+
+```text
+.
+├─ LICENSE
+├─ README.md
+├─ SKILL.md
+├─ agents/
+│  └─ openai.yaml
+└─ assets/
+   └─ TASK_TODO.template.md
+```
+
+---
+
+### File overview
+
+- `SKILL.md`  
+  Main skill definition, including trigger conditions, workflow, guardrails, and execution behavior.
+
+- `agents/openai.yaml`  
+  UI / interface metadata for the skill.
+
+- `assets/TASK_TODO.template.md`  
+  Recommended starter template for generating `TASK_TODO.md`.
+
+- `LICENSE`  
+  The open-source license currently used by this repository.
+
+---
+
+### Example usage
+
+```text
+Use $requirement-to-delivery to clarify this request, draft a plan, create TASK_TODO.md, and execute it step by step.
+```
+
+---
 
 ### Design principles
 
@@ -254,4 +294,4 @@ Each subtask should include:
 
 ## License
 
-Add a license if you want to distribute or reuse this repository publicly.
+This repository is licensed under the **MIT License**. See [LICENSE](./LICENSE).
